@@ -1,9 +1,10 @@
 //maze generator tutorial from The Coding Train
 
 var cols, rows;
-var w = 40;
+var w = 4;
 
 var grid = [];
+var stack = [];
 
 //current cell being visited
 var current;
@@ -33,11 +34,23 @@ function draw() {
     });
 
     current.visited = true;
+    current.highlight();
 
+    //STEP 1
     var next = current.checkNeighbors();
     if (next) {
+
         next.visited = true;
+
+        //step 2
+        stack.push(current);
+        //step 3
+        removeWalls(current, next);
+        //step 4
         current = next;
+
+    } else if (stack.length > 0) {
+        current = stack.pop();
     }
 
 }
@@ -92,6 +105,14 @@ function Cell(i, j) {
         }
     }
 
+    this.highlight = function () {
+        var x = this.i * w;
+        var y = this.j * w;
+        noStroke();
+        fill(0, 0, 255, 100);
+        rect(x, y, w, w)
+    }
+
 
 
     this.show = function () {
@@ -121,5 +142,28 @@ function Cell(i, j) {
             rect(x, y, w, w);
         }
 
+    }
+}
+
+
+function removeWalls(a, b) {
+
+    //difference between cell indicies
+    var x = a.i - b.i
+    if (x === 1) {
+        a.walls[3] = false;
+        b.walls[1] = false;
+    } else if (x === -1) {
+        a.walls[1] = false;
+        b.walls[3] = false;
+    }
+
+    var y = a.j - b.j
+    if (y === 1) {
+        a.walls[0] = false;
+        b.walls[2] = false;
+    } else if (y === -1) {
+        a.walls[2] = false;
+        b.walls[0] = false;
     }
 }
